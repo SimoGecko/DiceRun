@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-////////// PURPOSE:  //////////
+////////// PURPOSE: Represents a target that when hit gives you points //////////
 
 namespace sxg
 {
-    public class Ring : MonoBehaviour
+    public class Ring : MonoBehaviour // TODO: rename target
     {
         // -------------------- VARIABLES --------------------
 
@@ -32,8 +32,7 @@ namespace sxg
         
         void Update ()
         {
-            // text faces upwards
-            tmp.transform.localEulerAngles = new Vector3(0f, 0f, Angle());
+            TextFaceUpwards();
         }
     
         // -------------------- CUSTOM METHODS --------------------
@@ -43,21 +42,24 @@ namespace sxg
         void SetValue(int value)
         {
             this.value = Mathf.Clamp(value, 1, 6);
-            EDITOR_Setup();
+            tmp.text = value.ToString();
         }
         public void Used()
         {
-            // particles/effects
             GameObject newEffect = Instantiate(collectEffect, transform.position, transform.rotation) as GameObject;
             GameObject.Destroy(newEffect, 10f);
             Destroy(gameObject);
-            // delete
         }
-    
+
+        void TextFaceUpwards()
+        {
+            tmp.transform.localEulerAngles = new Vector3(0f, 0f, Angle());
+        }
+
         [EditorButton]
         void EDITOR_Setup()
         {
-            tmp.text = value.ToString();
+            SetValue(value);
         }
 
         public void SetRandom()

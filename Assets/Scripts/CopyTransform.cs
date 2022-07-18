@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-////////// PURPOSE:  //////////
+////////// PURPOSE: General-purpose script to copy the transform of another transform //////////
 
 namespace sxg
 {

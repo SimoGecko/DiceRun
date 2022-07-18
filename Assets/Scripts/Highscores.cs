@@ -5,23 +5,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-////////// easy to use class to communicate with the server //////////
+////////// PURPOSE: class that allows communication with a server to write and read to/from files, used to submit and retrieve highscores //////////
 
 namespace sxg
 {
-    //public delegate void Callback();
-    
-
     public class Highscores : MonoBehaviour
     {
         public event System.Action OnUpload, OnDownload;
 
         public int numLeadToDisplay = 10;
+        public int maxUsernameLength = 16;
         public bool log = false;
         const string baseUrl = "https://simoneguggiari.altervista.org/gmtk22/"; 
-        public ScoreEntry EDITOR_testEntry;
 
-        public ScoreEntry[] entries;
+
+        public ScoreEntry EDITOR_testEntry;
+        [ReadOnly] [SerializeField] private ScoreEntry[] entries;
 
         [LayoutBeginHorizontal]
         [EditorButton]
@@ -39,8 +38,10 @@ namespace sxg
         public void UploadEntry(string username, int score, int time)
         {
             if (string.IsNullOrEmpty(username) || score < 0 || time < 0) return;
+            username = Sanitize(username, maxUsernameLength);
             string timestamp = Utility.GetTimestampWeb(System.DateTime.Now);
             string uniqueDeviceID = SystemInfo.deviceUniqueIdentifier;
+            uniqueDeviceID = "n/a";
 
             ScoreEntry entry = new ScoreEntry(timestamp, uniqueDeviceID, username, score, time);
             UploadEntry(entry);
@@ -86,7 +87,7 @@ namespace sxg
              || request.result == UnityWebRequest.Result.ProtocolError;
         }
 
-        IEnumerator UploadRoutine(string file, string data)
+        private IEnumerator UploadRoutine(string file, string data)
         {
             WWWForm form = new WWWForm();
             form.AddField("name", file);
@@ -106,7 +107,7 @@ namespace sxg
             }
         }
 
-        IEnumerator DownloadRoutine(string file)
+        private IEnumerator DownloadRoutine(string file)
         {
             WWWForm form = new WWWForm();
             form.AddField("name", file);
@@ -143,12 +144,7 @@ namespace sxg
         }
         public string TimeString()
         {
-            return AggregateString(i =>
-            {
-                System.TimeSpan ts = System.TimeSpan.FromMilliseconds(entries[i].time);
-                return string.Format("{0:D2}:{1:D2}:{2:D3}", ts.Minutes, ts.Seconds, ts.Milliseconds);
-                //entries[i].time.ToString();
-            });
+            return AggregateString(i => entries[i].TimeString());
         }
         private string AggregateString(System.Func<int, string> f)
         {
@@ -160,6 +156,14 @@ namespace sxg
             return result;
         }
         #endregion
+
+        private string Sanitize(string username, int maxLength)
+        {
+            // TODO: SANITIZE, only [azAZ09.-]
+            // TODO: remove bad words and spam
+            if (username.Length > maxLength) return username.Substring(0, maxLength);
+            return username;
+        }
 
         private static Highscores instance;
         public static Highscores Instance
@@ -191,6 +195,7 @@ namespace sxg
             this.score = score;
             this.time = time;
         }
+
         public ScoreEntry() { }
 
         void CopyFrom(ScoreEntry other)
@@ -212,6 +217,12 @@ namespace sxg
             CopyFrom(result);
             return true; // success
         }
+        
+        public string TimeString()
+        {
+            return ScoreInterfaceManager.GetFormattedTime(time);
+        }
+
     }
 
 }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-////////// PURPOSE:  //////////
+////////// PURPOSE: Forces the player to rethrow the dice after a certain time or explodes otherwise //////////
 
 namespace sxg
 {

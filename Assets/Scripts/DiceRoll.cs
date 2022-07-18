@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-////////// PURPOSE:  //////////
+////////// PURPOSE: Used to simulate the roll of a dice when pressing a button //////////
 namespace sxg
 { 
     public class DiceRoll : MonoBehaviour
@@ -14,21 +14,23 @@ namespace sxg
         public event System.Action OnDiceRoll;
         public event System.Action<int> OnDiceNumber;
 
-        public Vector2 torqueRange = new Vector2(3000f, 5000f);
-        public Vector3 startPos;
-        public float forceUp = 500f;
-        public float gravity = -10f;
-        public float maxAngularVelocity = 1000f;
+        public Vector2 torqueRange = new Vector2(1f, 4f);
+        public Vector3 startPos = new Vector3(0f, 2f, 0f);
+        public float forceUp = 1000f;
+        public float gravity = -70f;
+        public float maxAngularVelocity = 100f;
 
-        public float stoppedThreshold = 0.1f;
-
+        public float velocityStoppedThreshold = 0.1f;
+        public float posYstoppedThreshold = 0.55f;
         public int number = 0;
+
+        public KeyCode rollKeycode = KeyCode.Space;
 
         // private
         bool mustRoll = false;
     
         // references
-        public Rigidbody rb;
+        Rigidbody rb;
 
 
         // -------------------- BASE METHODS --------------------
@@ -39,7 +41,7 @@ namespace sxg
             Physics.gravity = new Vector3(0f, gravity, 0f);
             rb.maxAngularVelocity = maxAngularVelocity;
 
-            GameManager.Instance.OnModeChanged += OnModeChanged;
+            GameManager.Instance.OnGameStarted += () => mustRoll = true;
         }
 
         void Start ()
@@ -49,7 +51,7 @@ namespace sxg
         
         void Update ()
         {
-            if (GameManager.Instance.InGame && Input.GetKeyDown(KeyCode.Space))
+            if (GameManager.Instance.InGame && Input.GetKeyDown(rollKeycode))
             {
                 mustRoll = true;
             }
@@ -63,13 +65,10 @@ namespace sxg
                 Roll();
             }
             if (number == -1) number = 0;
-            //rb.AddForce(Vector3.down * gravity);
             else if (number == 0 && IsStopped(rb))
             {
-                // check the face up
                 number = GetDiceNumber();
                 OnDiceNumber?.Invoke(number);
-                //Debug.Log("computing number " + number);
             }
         }
 
@@ -77,14 +76,6 @@ namespace sxg
 
 
         // commands
-        void OnModeChanged(GameManager.Mode mode)
-        {
-            if(mode == GameManager.Mode.Game)
-            {
-                mustRoll = true;
-            }
-        }
-
         void Roll()
         {
             OnDiceRoll?.Invoke();
@@ -98,32 +89,23 @@ namespace sxg
         }
 
 
-
         // queries
         bool IsStopped(Rigidbody rb)
         {
             //return rb.IsSleeping(); // works but too slow
-            return rb.position.y <= 0.55f && rb.velocity.sqrMagnitude <= stoppedThreshold && rb.angularVelocity.sqrMagnitude <= stoppedThreshold;
-        }
-
-        public static Quaternion RandomQuaternion()
-        {
-            //return Quaternion.Euler(Random.value * 360f, Random.value * 360f, Random.value * 360f);
-            float u = Random.value;
-            float v = Random.value;
-            float w = Random.value;
-            float twoPi = Mathf.PI * 2f;
-            return new Quaternion(Mathf.Sqrt(1 - u) * Mathf.Sin(twoPi*v), Mathf.Sqrt(1f - u) * Mathf.Cos(twoPi*v), Mathf.Sqrt(u) * Mathf.Sin(twoPi*w), Mathf.Sqrt(u) * Mathf.Cos(twoPi*w));
+            return (rb.position.y <= posYstoppedThreshold) && (rb.velocity.sqrMagnitude <= velocityStoppedThreshold) && (rb.angularVelocity.sqrMagnitude <= velocityStoppedThreshold);
         }
 
         int GetDiceNumber()
         {
-            if (transform.forward.y > 0.7f) return 1;
-            if (transform.right.y > 0.7f) return 2;
-            if (-transform.up.y > 0.7f) return 3;
-            if (transform.up.y > 0.7f) return 4;
-            if (-transform.right.y > 0.7f) return 5;
-            if (-transform.forward.y > 0.7f) return 6;
+            float threshold = 0.8f;
+            if ( transform.forward.y >= threshold) return 1;
+            if ( transform.right.y   >= threshold) return 2;
+            if (-transform.up.y      >= threshold) return 3;
+            if ( transform.up.y      >= threshold) return 4;
+            if (-transform.right.y   >= threshold) return 5;
+            if (-transform.forward.y >= threshold) return 6;
+            Debug.LogWarning("Could not find a side up");
             return 0;
         }
 

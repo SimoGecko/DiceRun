@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-////////// PURPOSE:  //////////
+////////// PURPOSE: Checks collisions between the transform and the level, as well as registers hits with various objects //////////
 
 namespace sxg
 {
@@ -13,16 +13,16 @@ namespace sxg
 
         // public
         public float circleRadius = 1f;
-        public float explosionCameraTrauma = 0.5f;
-        public float ringCollectedCameraTrauma = 0.5f;
+        public float explosionCameraTrauma = 1f;
+        public float ringCollectedCameraTrauma = 0.7f;
 
         // private
-        LevelGenerator.Circle circle0, circle1;
+        OCircle circle0, circle1;
         bool exploded = false;
 
         // references
-        public ScoreManager scorem;
-        public DiceRoll diceroll;
+        ScoreInterfaceManager scorem;
+        DiceRoll diceroll;
 
         public GameObject explosionParticles;
         public GameObject objectToHide;
@@ -31,8 +31,9 @@ namespace sxg
 
         private void Awake()
         {
-            //LevelGenerator.Instance.OnLevelCreated
             FindObjectOfType<RethrowForcer>().OnRethrowFailed += Explode;
+            scorem = FindObjectOfType<ScoreInterfaceManager>();
+            diceroll = FindObjectOfType<DiceRoll>();
         }
 
         void Start ()
@@ -52,7 +53,6 @@ namespace sxg
             {
                 while (GotoNextCircle(transform.position))
                 {
-                    //Debug.Log("goto next circle");
                     circle0 = circle1;
                     circle1 = LevelGenerator.Instance.GetNextCircle();
                 }
@@ -70,7 +70,6 @@ namespace sxg
                 Ring ring = other.GetComponent<Ring>();
                 if (ring.value == diceroll.number)
                 {
-                    // add score
                     scorem.AddScore(ring.value);
                     CameraManger.Instance.AddTrauma(ringCollectedCameraTrauma);
                     ring.Used();
@@ -97,15 +96,8 @@ namespace sxg
 
             CameraManger.Instance.AddTrauma(explosionCameraTrauma);
 
-
             objectToHide.SetActive(false);
             Instantiate(explosionParticles, objectToHide.transform.position, objectToHide.transform.rotation);
-            //this.Invoke(nameof(SetGameOver), 1f);
-            SetGameOver();
-        }
-
-        void SetGameOver()
-        {
             GameManager.Instance.SetMode(GameManager.Mode.Over);
         }
 
@@ -127,15 +119,11 @@ namespace sxg
         }
 
 
-
         // other
         private void OnDrawGizmos()
         {
-            //if (circle0 != null)
-            {
-                Gizmos.color = Color.cyan;
-                Gizmos2.DrawWireCircle(circle0.center, circle0.radius, circle0.orientation * Vector3.forward);
-            }
+            Gizmos.color = Color.cyan;
+            Gizmos2.DrawWireCircle(circle0.center, circle0.radius, circle0.orientation * Vector3.forward);
         }
     }
 }

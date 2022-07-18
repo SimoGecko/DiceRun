@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-////////// PURPOSE:  //////////
+////////// PURPOSE: Controls the state of the game //////////
 
 namespace sxg
 {
@@ -14,16 +14,17 @@ namespace sxg
 
         // public
         public event System.Action<Mode> OnModeChanged;
+        public event System.Action OnGameStarted;
         
         public enum Mode { Menu, Game, Over}
-        public Mode mode;
-    
+
         // private
-    
-    
+        Mode mode;
+
+
         // references
-        
-        
+
+
         // -------------------- BASE METHODS --------------------
 
         void Start ()
@@ -42,8 +43,9 @@ namespace sxg
         // commands
         public void SetMode(Mode newMode)
         {
-            this.mode = newMode;
+            mode = newMode;
             OnModeChanged?.Invoke(mode);
+            if (mode == Mode.Game) OnGameStarted?.Invoke();
         }
 
         public void RestartGame()

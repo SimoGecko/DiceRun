@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-////////// PURPOSE:  //////////
+////////// PURPOSE: Allows to control an object with plane-style controls //////////
 
 namespace sxg
 {
@@ -12,7 +12,8 @@ namespace sxg
         // -------------------- VARIABLES --------------------
 
         // public
-        public float speed = 20f;
+        [Header("Controls")]
+        public float speed = 40f;
         public float pitchSpeed = 90f;
         public float yawSpeed = 90f;
         public float rollSpeed = -120f;
@@ -21,12 +22,12 @@ namespace sxg
         public float rollSmooth = 0.1f;
         public float yawSmooth = 0.1f;
 
+        [Header("Boost")]
         public float boostMultiplier = 2f;
         public float boostSmooth = 0.2f;
 
-        public float boostCameraTrauma = 0.2f;
+        public float boostCameraTrauma = 0.5f;
 
-        [ReadOnly] public float mult;
         // private
         float rollInput, rollRef;
         float pitchInput, pitchRef;
@@ -62,11 +63,12 @@ namespace sxg
         // commands
         void MovePlane()
         {
-            Vector2 input = GetDirectionInput();
+            Vector2 inputDir = GetDirectionInput();
             float inputQE = GetInputQE();
-            rollInput = Mathf.SmoothDamp(rollInput, inputQE, ref rollRef, rollSmooth);
-            pitchInput = Mathf.SmoothDamp(pitchInput, input.y, ref pitchRef, pitchSmooth);
-            yawInput = Mathf.SmoothDamp(yawInput, input.x, ref yawRef, yawSmooth);
+
+            rollInput  = Mathf.SmoothDamp(rollInput,  inputQE,    ref rollRef,  rollSmooth);
+            pitchInput = Mathf.SmoothDamp(pitchInput, inputDir.y, ref pitchRef, pitchSmooth);
+            yawInput   = Mathf.SmoothDamp(yawInput,   inputDir.x, ref yawRef,   yawSmooth);
 
             bool boostInput = GetBoostInput();
             boost = Mathf.SmoothDamp(boost, boostInput ? boostMultiplier : 1f, ref boostRef, boostSmooth);
@@ -76,17 +78,9 @@ namespace sxg
             transform.Rotate(new Vector3(pitchSpeed * pitchInput * Time.deltaTime, 0f, 0f), Space.Self);
             transform.Rotate(new Vector3(0f, yawSpeed * yawInput * Time.deltaTime, 0f), Space.Self);
 
-            float speedMultiplier = Difficulty.Instance.GetMultiplier(ScoreManager.Instance.WallTimeSeconds);
-            mult = speedMultiplier;
+            float speedMultiplier = Difficulty.Instance.GetMultiplier();
             transform.Translate(Vector3.forward * speed * boost * Time.deltaTime * speedMultiplier, Space.Self);
         }
-
-        public void Explode()
-        {
-            if (exploded) return;
-            exploded = true;
-        }
-
 
 
         // queries

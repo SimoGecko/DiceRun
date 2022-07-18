@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-////////// PURPOSE:  //////////
+////////// PURPOSE: Provides a monotonically increasing curve representing how difficulty changes with time //////////
 
 namespace sxg
 {
@@ -31,16 +31,20 @@ namespace sxg
         {
             
         }
-    
+
         // -------------------- CUSTOM METHODS --------------------
-    
-    
+
+
         // commands
 
-    
 
-    
+
+
         // queries
+        public float GetMultiplier()
+        {
+            return GetMultiplier(ScoreInterfaceManager.Instance.WallTimeSeconds);
+        }
         public float GetMultiplier(float time)
         {
             time = Mathf.Max(time, 0f);
