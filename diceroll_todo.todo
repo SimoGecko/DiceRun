@@ -1,0 +1,63 @@
+DICE RUN:
+  ✔ level mesh @done (22-07-16 18:35)
+  ✔ collision with mesh @done (22-07-16 19:09)
+  ✔ explosion effect @done (22-07-16 19:36)
+  ✔ game flow @done (22-07-16 19:40)
+  ✔ placement of rings @done (22-07-17 10:05)
+  ✔ number shown @done (22-07-17 10:05)
+
+  ✔ speed/difficulty increase @done (22-07-17 17:38)
+  ✔ online highscores @done (22-07-17 19:02)
+  ✔ camshake on boost @done (22-07-17 17:54)
+  ✔ force to rethrow @high @done (22-07-17 19:40)
+  ✔ chunk generation @high @done (22-07-17 20:37)
+
+
+  ☐ audio effects @high
+    start
+    boost
+    roll
+    collect
+    crash/explode
+    (music)
+
+effects/polish:
+  ☐ autofollow @high
+  ☐ ensure more randomness in throw @high
+  ☐ camera shold keep kinda same distance with increased speed @high
+  ☐ keep camera inside
+  ☐ make throw faster
+  ☐ store username
+  ☐ fix mesh discontinuities @Low
+  ☐ icon
+  ☐ quit button
+  ✔ smooth title go away @done (22-07-17 20:06)
+  ✔ no jitter at beginning @done (22-07-17 20:02)
+  ✔ numbers looking up @high @done (22-07-17 19:54)
+  ✔ show gameover after some time @done (22-07-17 19:20)
+  ✘ no self intersections in generation @cancelled (22-07-17 19:02)
+  ✔ improve buttons at the end @done (22-07-17 18:53)
+  ✔ disable red stuff on gameover @done (22-07-17 19:02)
+  ✔ sync time @done (22-07-17 18:58)
+
+Bugs:
+  ✔ collision not detected @done (22-07-16 19:36)
+
+  #D41818
+
+
+
+  Controls:
+
+WASD/QE: MOVE
+SPACE: ROLL DICE
+LEFT SHIFT: BOOST
+
+GO THROUGH THE RED CIRCLED NUMBERS WHILE YOUR DICE SHOWS THE CORRECT NUMBER TO SCORE POINTS. AVOID COLLIDING AND RE-ROLL YOUR DICE BEFORE THE TIMER RUNS OUT TO AVOID EXPLODING.
+
+
+FEEDBACK:
+  hard to score points (too short time for die or not enough targets)
+  run into wall-error
+  background music
+  allow control inversion
