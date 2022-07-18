@@ -34,7 +34,17 @@ namespace sxg
         
         void Update ()
         {
-            if (mode == Mode.Menu && RelevantInputPressed()) SetMode(Mode.Game);
+            if (mode == Mode.Menu)
+            {
+                if (StartInputPressed())
+                {
+                    SetMode(Mode.Game);
+                }
+                if (EscInputPressed())
+                {
+                    Quit();
+                }
+            }
         }
 
         // -------------------- CUSTOM METHODS --------------------
@@ -54,13 +64,22 @@ namespace sxg
             SceneManager.LoadScene(scene.name);
         }
 
+        public void Quit()
+        {
+            Application.Quit();
+        }
+
         // queries
-        bool RelevantInputPressed()
+        bool StartInputPressed()
         {
             KeyCode[] codes = new KeyCode[] { KeyCode.W, KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.Q, KeyCode.E, KeyCode.LeftShift, KeyCode.Space };
             foreach (KeyCode kc in codes) if (Input.GetKeyDown(kc)) return true;
-            if (Input.GetMouseButtonDown(0)) return true;
+            //if (Input.GetMouseButtonDown(0)) return true;
             return false;
+        }
+        bool EscInputPressed()
+        {
+            return Input.GetKeyDown(KeyCode.Escape);
         }
         public bool InGame { get { return mode == Mode.Game; } }
 

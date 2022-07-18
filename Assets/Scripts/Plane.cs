@@ -14,19 +14,24 @@ namespace sxg
         // public
         [Header("Controls")]
         public float speed = 40f;
-        public float pitchSpeed = 90f;
         public float yawSpeed = 90f;
+        public float pitchSpeed = -90f;
         public float rollSpeed = -120f;
 
+        public float yawSmooth = 0.1f;
         public float pitchSmooth = 0.1f;
         public float rollSmooth = 0.1f;
-        public float yawSmooth = 0.1f;
+        
+        public bool invertYaw = false;
+        public bool invertPitch = false;
+        public bool invertRoll = false;
 
         [Header("Boost")]
         public float boostMultiplier = 2f;
         public float boostSmooth = 0.2f;
 
         public float boostCameraTrauma = 0.5f;
+        public GameObject boostSpeedLines;
 
         // private
         float rollInput, rollRef;
@@ -47,14 +52,16 @@ namespace sxg
         
         void Update ()
         {
+            bool boosting = GetBoostInput();
             if (GameManager.Instance.InGame && !exploded)
             {
                 MovePlane();
-                if(GetBoostInput())
+                if(boosting)
                 {
                     CameraManger.Instance.SetTrauma(boostCameraTrauma);
                 }
             }
+            boostSpeedLines.gameObject.SetActive(boosting);
         }
 
         // -------------------- CUSTOM METHODS --------------------
@@ -65,6 +72,10 @@ namespace sxg
         {
             Vector2 inputDir = GetDirectionInput();
             float inputQE = GetInputQE();
+
+            if (invertYaw) inputDir.x *= -1f;
+            if (invertPitch) inputDir.y *= -1f;
+            if (invertRoll) inputQE *= -1f;
 
             rollInput  = Mathf.SmoothDamp(rollInput,  inputQE,    ref rollRef,  rollSmooth);
             pitchInput = Mathf.SmoothDamp(pitchInput, inputDir.y, ref pitchRef, pitchSmooth);
